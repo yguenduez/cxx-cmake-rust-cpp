@@ -1,0 +1,53 @@
+[tools]
+rust = "1.98.1"
+cmake = "4.4.3"
+ninja = "1.13.2"
+
+# Load FINNHUB_API_KEY (and anything else) from a local, untracked .env file.
+[env]
+_.file = ".env"
+
+[tasks.configure]
+description = "Configure the CMake build"
+run = "cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release"
+
+[tasks."build:rust"]
+description = "Build the rust_lib crate"
+dir = "rust_lib"
+run = "cargo build --release"
+
+[tasks.build]
+description = "Build rust_lib and the C++/ImGui app"
+depends = ["configure", "build:rust"]
+run = "cmake --build build"
+
+[tasks.run]
+description = "Run the ImGui stock price app"
+depends = ["build"]
+run = "./build/cpp_app/cpp_app"
+
+[tasks."test:rust"]
+description = "Run the rust_lib test suite"
+dir = "rust_lib"
+run = "cargo test"
+
+[tasks."test:rust:live"]
+description = "Run the rust_lib tests including the live Finnhub call (needs FINNHUB_API_KEY)"
+dir = "rust_lib"
+run = "cargo test -- --ignored"
+
+[tasks.test]
+description = "Run all tests"
+depends = ["test:rust"]
+
+[tasks.lint]
+description = "Format and lint the Rust crate"
+dir = "rust_lib"
+run = "cargo fmt --check && cargo clippy --all-targets"
+
+[tasks.clean]
+description = "Remove build artifacts"
+run = "rm -rf build && (cd rust_lib && cargo clean)"
+
+# TODO(ffi): once cpp_app links rust_lib through a cxx bridge, also build/link
+# the Rust static library from CMake (build:rust already compiles the crate).
