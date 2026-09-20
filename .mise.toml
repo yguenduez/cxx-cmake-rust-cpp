@@ -47,7 +47,7 @@ run = "cargo fmt --check && cargo clippy --all-targets"
 
 [tasks.clean]
 description = "Remove build artifacts"
-run = "rm -rf build && (cd rust_lib && cargo clean)"
+run = "rm -rf build rust_lib/rust_lib_cpp/include && (cd rust_lib && cargo clean)"
 
-# TODO(ffi): once cpp_app links rust_lib through a cxx bridge, also build/link
-# the Rust static library from CMake (build:rust already compiles the crate).
+# rust_lib exposes a cxx.rs bridge; CMake drives `cargo build --release` and
+# publishes the generated headers into rust_lib/rust_lib_cpp/include.

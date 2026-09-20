@@ -32,8 +32,10 @@ target_link_libraries(imgui PUBLIC SDL2::SDL2 OpenGL::GL)
 # The application.
 add_executable(cpp_app
     src/main.cpp
+    src/rust_stock_api.cpp
     src/mock_stock_api.cpp
 )
 target_include_directories(cpp_app PRIVATE include)
 target_compile_features(cpp_app PRIVATE cxx_std_17)
-target_link_libraries(cpp_app PRIVATE imgui)
+target_link_libraries(cpp_app PRIVATE imgui rust_lib_cpp)
+add_dependencies(cpp_app rust_lib_build)

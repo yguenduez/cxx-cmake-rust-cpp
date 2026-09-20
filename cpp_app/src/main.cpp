@@ -6,7 +6,7 @@
 #include "imgui_impl_opengl3.h"
 #include "imgui_impl_sdl2.h"
 
-#include "stock/mock_stock_api.hpp"
+#include "stock/rust_stock_api.hpp"
 
 #include <array>
 #include <memory>
@@ -82,8 +82,8 @@ int main(int, char**) {
     ImGui_ImplSDL2_InitForOpenGL(window, gl_context);
     ImGui_ImplOpenGL3_Init(glsl_version);
 
-    // To be replaced with the real FFI Rust class
-    std::unique_ptr<stock::IStockApi> api = std::make_unique<stock::MockStockApi>();
+    // Calls into `rust_lib` through the cxx.rs bridge.
+    std::unique_ptr<stock::IStockApi> api = std::make_unique<stock::RustStockApi>();
 
     std::array<char, 32> symbol = {'A', 'A', 'P', 'L', '\0'};
     stock::QuoteResult result;
