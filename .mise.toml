@@ -7,6 +7,32 @@ ninja = "1.13.2"
 [env]
 _.file = ".env"
 
+[tasks.setup]
+description = "Install native dependencies for macOS or Debian/Ubuntu"
+run = '''
+case "$(uname -s)" in
+  Darwin)
+    command -v brew >/dev/null 2>&1 || {
+      echo "Homebrew is required: https://brew.sh"
+      exit 1
+    }
+    brew install sdl2
+    ;;
+  Linux)
+    command -v apt-get >/dev/null 2>&1 || {
+      echo "Only Debian/Ubuntu Linux is supported"
+      exit 1
+    }
+    sudo apt-get update
+    sudo apt-get install -y libsdl2-dev
+    ;;
+  *)
+    echo "Unsupported operating system: $(uname -s)"
+    exit 1
+    ;;
+esac
+'''
+
 [tasks.configure]
 description = "Configure the CMake build"
 run = "cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release"
