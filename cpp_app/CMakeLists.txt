@@ -38,4 +38,3 @@ add_executable(cpp_app
 target_include_directories(cpp_app PRIVATE include)
 target_compile_features(cpp_app PRIVATE cxx_std_17)
 target_link_libraries(cpp_app PRIVATE imgui rust_lib_cpp)
-add_dependencies(cpp_app rust_lib_build)
