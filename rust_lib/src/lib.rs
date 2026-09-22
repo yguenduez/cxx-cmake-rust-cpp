@@ -115,6 +115,48 @@ pub fn current_price(symbol: &str) -> Result<f64, Error> {
     quote(symbol).map(|q| q.c)
 }
 
+/// FFI surface exposed to C++ through cxx.rs.
+#[cxx::bridge(namespace = "rust_lib")]
+mod ffi {
+    /// Quote crossing the FFI boundary. cxx does not support `Option` yet, so
+    /// `has_change` signals whether `change`/`percent_change` are meaningful.
+    struct Quote {
+        current: f64,
+        change: f64,
+        has_change: bool,
+        percent_change: f64,
+        high: f64,
+        low: f64,
+        open: f64,
+        previous_close: f64,
+        timestamp: i64,
+    }
+
+    extern "Rust" {
+        fn current_price(symbol: &str) -> Result<f64>;
+        fn stock_quote(symbol: &str) -> Result<Quote>;
+    }
+}
+
+fn to_ffi_quote(quote: Quote) -> ffi::Quote {
+    ffi::Quote {
+        current: quote.c,
+        change: quote.d.unwrap_or(0.0),
+        has_change: quote.d.is_some(),
+        percent_change: quote.dp.unwrap_or(0.0),
+        high: quote.h,
+        low: quote.l,
+        open: quote.o,
+        previous_close: quote.pc,
+        timestamp: quote.t,
+    }
+}
+
+/// Like [`quote`], but returns the FFI-friendly [`ffi::Quote`].
+fn stock_quote(symbol: &str) -> Result<ffi::Quote, Error> {
+    quote(symbol).map(to_ffi_quote)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -140,6 +182,43 @@ mod tests {
         assert_eq!(quote.c, 0.0);
         assert_eq!(quote.d, None);
         assert_eq!(quote.dp, None);
+    }
+
+    #[test]
+    fn maps_quote_to_ffi() {
+        let quote = Quote {
+            c: 189.84,
+            d: Some(2.34),
+            dp: Some(1.2481),
+            h: 190.0,
+            l: 186.5,
+            o: 187.2,
+            pc: 187.5,
+            t: 1_700_000_000,
+        };
+        let ffi = to_ffi_quote(quote);
+        assert_eq!(ffi.current, 189.84);
+        assert_eq!(ffi.change, 2.34);
+        assert!(ffi.has_change);
+        assert_eq!(ffi.percent_change, 1.2481);
+        assert_eq!(ffi.timestamp, 1_700_000_000);
+    }
+
+    #[test]
+    fn maps_null_change_to_ffi() {
+        let quote = Quote {
+            c: 10.0,
+            d: None,
+            dp: None,
+            h: 11.0,
+            l: 9.0,
+            o: 10.0,
+            pc: 10.0,
+            t: 1_700_000_000,
+        };
+        let ffi = to_ffi_quote(quote);
+        assert_eq!(ffi.change, 0.0);
+        assert!(!ffi.has_change);
     }
 
     #[test]
