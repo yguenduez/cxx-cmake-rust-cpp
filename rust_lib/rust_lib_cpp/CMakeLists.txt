@@ -2,13 +2,9 @@ find_program(CARGO_EXECUTABLE cargo REQUIRED)
 
 set(RUST_LIB ${CMAKE_CURRENT_SOURCE_DIR}/../target/release/librust_lib.a)
 
-if(APPLE)
-    set(RUST_BUILD_COMMAND ${CMAKE_COMMAND} -E env
-        MACOSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET}
-        ${CARGO_EXECUTABLE} build --release)
-else()
-    set(RUST_BUILD_COMMAND ${CARGO_EXECUTABLE} build --release)
-endif()
+set(RUST_BUILD_COMMAND ${CMAKE_COMMAND} -E env
+    MACOSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET}
+    ${CARGO_EXECUTABLE} build --release)
 
 # This is basically cargo build --release with CMake
 add_custom_target(rust_lib_build

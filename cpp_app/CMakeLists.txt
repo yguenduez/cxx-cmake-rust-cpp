@@ -1,5 +1,5 @@
-# Dear ImGui: no upstream CMake package, so build it from source. SDL2 + OpenGL3
-# is used because that combination works on Windows, Linux and macOS.
+# Dear ImGui ships no upstream CMake package, so build the SDL2 + OpenGL3
+# backend from source.
 include(FetchContent)
 
 FetchContent_Declare(
