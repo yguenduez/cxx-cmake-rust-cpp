@@ -40,7 +40,13 @@ run = "cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release"
 [tasks."build:rust"]
 description = "Build the rust_lib crate"
 dir = "rust_lib"
-run = "cargo build --release"
+run = '''
+if [ "$(uname -s)" = Darwin ]; then
+  MACOSX_DEPLOYMENT_TARGET=26.0 cargo build --release
+else
+  cargo build --release
+fi
+'''
 
 [tasks.build]
 description = "Build rust_lib and the C++/ImGui app"
