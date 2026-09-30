@@ -118,8 +118,6 @@ pub fn current_price(symbol: &str) -> Result<f64, Error> {
 /// FFI surface exposed to C++ through cxx.rs.
 #[cxx::bridge(namespace = "rust_lib")]
 mod ffi {
-    /// Quote crossing the FFI boundary. cxx does not support `Option` yet, so
-    /// `has_change` signals whether `change`/`percent_change` are meaningful.
     struct Quote {
         current: f64,
         change: f64,
