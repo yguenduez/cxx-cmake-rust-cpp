@@ -47,6 +47,11 @@ description = "Run the ImGui stock price app"
 depends = ["build"]
 run = "./build/cpp_app/cpp_app"
 
+[tasks."run:mock"]
+description = "Run the app with the offline MockStockApi (no network or API key)"
+depends = ["build"]
+run = "./build/cpp_app/cpp_app --mock"
+
 [tasks."test:rust"]
 description = "Run the rust_lib test suite"
 dir = "rust_lib"

@@ -33,6 +33,7 @@ The first build is slower because Cargo and CMake compile the dependencies.
 | --- | --- |
 | `mise run build` | Build the Rust crate and the C++ app |
 | `mise run run` | Build and launch the app |
+| `mise run run:mock` | Launch the app with offline fake quotes |
 | `mise run test` | Run the Rust test suite |
 | `mise run test:rust:live` | Run tests including the live Finnhub call |
 | `mise run lint` | Check Rust formatting and run Clippy |
@@ -75,7 +76,8 @@ CMake invokes Cargo, so a separate `cargo build` is not required.
 ```
 
 The UI depends only on `stock::IStockApi`; `RustStockApi` implements it over the
-cxx.rs bridge, and `MockStockApi` is available for offline use.
+cxx.rs bridge, and `MockStockApi` returns fake quotes for offline use. Start
+the app with `--mock` (or `mise run run:mock`) to use it.
 
 ## How It Works
 

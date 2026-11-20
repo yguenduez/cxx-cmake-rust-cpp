@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <optional>
 #include <string>
+#include <variant>
 
 namespace stock {
 
@@ -27,34 +28,18 @@ struct Quote {
 };
 
 /// Result of a quote lookup: either a quote or a human readable error.
-struct QuoteResult {
-    std::optional<Quote> quote;
-    std::string error;
-
-    [[nodiscard]] bool ok() const noexcept { return quote.has_value(); }
-    explicit operator bool() const noexcept { return ok(); }
-};
+using QuoteResult = std::variant<Quote, std::string>;
 
 /// Abstraction over the stock price backend.
 ///
-/// The UI only depends on this interface. Start with `MockStockApi`; later the
-/// FFI wrapper around `rust_lib` implements the same interface and the UI does
-/// not change.
+/// The UI only depends on this interface, so `RustStockApi` and the offline
+/// `MockStockApi` are interchangeable.
 class IStockApi {
 public:
     virtual ~IStockApi() = default;
 
     /// Looks up the current quote for `symbol` (e.g. "AAPL").
     virtual QuoteResult quote(const std::string& symbol) = 0;
-
-    /// Convenience wrapper returning only the current price.
-    virtual std::optional<double> current_price(const std::string& symbol) {
-        auto result = quote(symbol);
-        if (!result.ok()) {
-            return std::nullopt;
-        }
-        return result.quote->current;
-    }
 };
 
 } // namespace stock

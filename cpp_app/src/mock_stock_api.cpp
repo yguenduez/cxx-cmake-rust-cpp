@@ -19,10 +19,10 @@ std::string normalize(std::string symbol) {
 QuoteResult MockStockApi::quote(const std::string& symbol) {
     const std::string sym = normalize(symbol);
     if (sym.empty()) {
-        return {std::nullopt, "Enter a stock symbol."};
+        return std::string("Enter a stock symbol.");
     }
     if (sym == "ERR" || sym == "FAIL") {
-        return {std::nullopt, "Unknown symbol: " + sym};
+        return "Unknown symbol: " + sym;
     }
 
     // Deterministic pseudo price in the range 10.00 - 999.99.
@@ -45,7 +45,7 @@ QuoteResult MockStockApi::quote(const std::string& symbol) {
     quote.previous_close = base - change;
     quote.timestamp = 1700000000;
 
-    return {quote, {}};
+    return quote;
 }
 
 } // namespace stock
