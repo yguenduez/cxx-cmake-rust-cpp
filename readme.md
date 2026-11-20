@@ -80,9 +80,11 @@ cxx.rs bridge, and `MockStockApi` is available for offline use.
 ## How It Works
 
 1. `rust_lib` fetches quotes from Finnhub; `cxx.rs` defines the FFI boundary.
-2. `build.rs` publishes the generated headers into `rust_lib/rust_lib_cpp/include`.
-3. CMake drives Cargo to build `librust_lib.a`, then builds and links `cpp_app`
-   against the `rust_lib_cpp` target.
+2. CMake drives Cargo to build `librust_lib.a` into the CMake build directory,
+   using the dev profile for `Debug` builds and release otherwise.
+3. `build.rs` generates the bridge headers into Cargo's `cxxbridge` directory,
+   which the `rust_lib_cpp` target adds to its include path.
+4. CMake builds `cpp_app` and links it against the `rust_lib_cpp` target.
 
 Generated headers and build output are recreated during the build and are not
 committed.

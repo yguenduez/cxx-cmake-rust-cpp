@@ -37,20 +37,9 @@ esac
 description = "Configure the CMake build"
 run = "cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release"
 
-[tasks."build:rust"]
-description = "Build the rust_lib crate"
-dir = "rust_lib"
-run = '''
-if [ "$(uname -s)" = Darwin ]; then
-  MACOSX_DEPLOYMENT_TARGET=26.0 cargo build --release
-else
-  cargo build --release
-fi
-'''
-
 [tasks.build]
-description = "Build rust_lib and the C++/ImGui app"
-depends = ["configure", "build:rust"]
+description = "Build rust_lib and the C++/ImGui app (CMake drives Cargo)"
+depends = ["configure"]
 run = "cmake --build build"
 
 [tasks.run]
@@ -79,7 +68,4 @@ run = "cargo fmt --check && cargo clippy --all-targets"
 
 [tasks.clean]
 description = "Remove build artifacts"
-run = "rm -rf build rust_lib/rust_lib_cpp/include && (cd rust_lib && cargo clean)"
-
-# rust_lib exposes a cxx.rs bridge; CMake drives `cargo build --release` and
-# publishes the generated headers into rust_lib/rust_lib_cpp/include.
+run = "rm -rf build && (cd rust_lib && cargo clean)"
